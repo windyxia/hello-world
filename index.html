@@ -3,10 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>购物车</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+    </style>
 </head>
 <body>
-    hello world
-    <script src="hello.js"></script>
+    <!--宿主文件-->
+    <div id="app">
+        <h2 v-bind:title="title"> 
+            <!-- 插值文本 -->
+            {{title}}
+        </h2>
+
+        <!-- 用户输入 -->
+        <p>
+            <input type="text" v-model="course" v-on:keydown.enter="addCourse">
+            <button @click="addCourse">新增</button>
+        </p>
+        <!-- 条件渲染 -->
+        <p v-if="course.length == 0">没有任何课程信息</p>
+
+        <!-- 列表渲染 -->
+        <!-- <div v-for="item in courses" :key="item"
+            :class="{active: selectedCourse === item}" @click="selectedCourse = item">
+            {{ item }}
+        </div> -->
+        <!-- style -->
+        <div class="course-list" v-else>
+            <div v-for="item in courses" :key="item"
+            :style="{'background-color' : (selectedCourse === item ? '#ddd' : 'transparent')}" @click="selectedCourse = item">
+                {{ item }}
+            </div>
+        </div>
+        
+    </div>
+    <script src="vue.js"></script>
+    <script>
+        // 1.创建vue实例
+        const app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    title: '开课吧购物车',
+                    course: '',
+                    selectedCourse: '',
+                    courses: ['web全栈', 'web高级']
+                }
+            },
+            methods: {
+                addCourse() {
+                    // 1.添加Course到数组
+                    this.courses.push(this.course)
+                    // 2.清空Course
+                    this.course = ''
+                }
+            },
+            render() {
+                with (this) {
+                    // this指当前组件的实例
+                    return  
+                } 
+            }
+        })
+        console.log(app.$options.render);
+    </script>
 </body>
 </html>
