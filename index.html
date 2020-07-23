@@ -18,26 +18,13 @@
             {{title}}
         </h2>
 
-        <!-- 用户输入 -->
-        <p>
-            <input type="text" v-model="course" v-on:keydown.enter="addCourse">
-            <button @click="addCourse">新增</button>
-        </p>
-        <!-- 条件渲染 -->
-        <p v-if="courses.length == 0">没有任何课程信息</p>
+        <!-- 新增课程 -->
+        <course-add v-model="course" @add-course="addCourse"></course-add>
+        <!-- <course-add :value="course" @input="course=$event" @add-course="addCourse"></course-add> -->
 
-        <!-- 列表渲染 -->
-        <!-- <div v-for="item in courses" :key="item"
-            :class="{active: selectedCourse === item}" @click="selectedCourse = item">
-            {{ item }}
-        </div> -->
-        <!-- style -->
-        <div class="course-list" v-else>
-            <div v-for="item in courses" :key="item"
-            :style="{'background-color' : (selectedCourse === item ? '#ddd' : 'transparent')}" @click="selectedCourse = item">
-                {{ item }}
-            </div>
-        </div>
+       
+        <!-- 列表组件 -->
+        <course-list :courses="courses"></course-list>
         
         <!-- 商品总数 -->
         <p>
@@ -51,6 +38,64 @@
     </div>
     <script src="vue.js"></script>
     <script>
+        //课程新增组件
+        Vue.component('course-add', {
+            props: ['value'],
+            template: `
+                <div>
+                    <!-- 用户输入 -->
+                    <p>
+                        <input type="text" :value="value" 
+                            @input="onInput"
+                            v-on:keydown.enter="addCourse">
+                        <button @click="addCourse">新增</button>
+                    </p>
+                </div>
+            `,
+            methods: {
+                addCourse() {
+                    // 派发事件通知父组件新增课程
+                    this.$emit('add-course')
+                },
+                onInput(e) {
+                    this.$emit('input', e.target.value)
+                }
+            },
+        })
+        //课程列表组件
+        Vue.component('course-list', {
+            data() {
+                return {
+                    selectedCourse: '',
+                }
+            },
+            props: {
+                courses: {
+                    type: Array,
+                    default: [],
+                }
+            },
+            template: `
+                <div>
+                    <!-- 条件渲染 -->
+                    <p v-if="courses.length == 0">没有任何课程信息</p>
+
+                    <!-- 列表渲染 -->
+                    <!-- <div v-for="item in courses" :key="item"
+                        :class="{active: selectedCourse === item}" @click="selectedCourse = item">
+                        {{ item }}
+                    </div> -->
+                    <!-- style -->
+                    <div class="course-list" v-else>
+                        <div v-for="item in courses" :key="item"
+                            :style="{'background-color' : (selectedCourse === item ? '#ddd' : 'transparent')}" @click="selectedCourse = item">
+                            {{ item }}
+                        </div>
+                    </div>
+                </div>
+            `
+        })
+
         //模拟异步数据调用
         function getCourses() {
             return new Promise(resolve => {
@@ -67,7 +112,6 @@
                 return {
                     title: '开课吧购物车',
                     course: '',
-                    selectedCourse: '',
                     courses: [],
                     totalCount: 0,
                 }
@@ -80,9 +124,8 @@
             // mounted(){},
             methods: {
                 addCourse() {
-                    // 1.添加Course到数组
+                    // 添加Course到数组
                     this.courses.push(this.course)
-                    // 2.清空Course
                     this.course = ''
                 }
             },
